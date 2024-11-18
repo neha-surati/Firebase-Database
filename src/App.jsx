@@ -1,75 +1,77 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createPost, editPost} from "./feature/post/Postslice";
+import { useDispatch } from "react-redux";
+import { createPost, editPost } from "./feature/post/Postslice";
 import View_post from "./components/View_post";
-
 
 function App() {
   const [post, setPost] = useState({});
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
   const [editId, setEditId] = useState("");
 
-  let handleEdit=(post)=>{
+  const handleEdit = (post) => {
     setPost(post);
     setEditId(post.id);
-  }
- 
-  
+  };
+
   const handleInput = (e) => {
     const { name, value } = e.target;
     setPost({ ...post, [name]: value });
   };
 
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if(editId ==""){
+    if (!post.title || !post.discription) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (editId === "") {
       dispatch(createPost(post));
-    }else{
+    } else {
       dispatch(editPost(post));
+      setEditId("");
     }
     setPost({});
   };
+
   return (
-    <>
-      <div className="container">
-        <form className="w-50 mx-auto mt-5" onSubmit={handleSubmit}>
-          <div className="mb-3 ">
-            <label htmlFor="exampleInputEmail1" className="form-label">
-             Title
+    <div className="container mt-5">
+      <div className="card shadow-sm p-4 mb-5 bg-white rounded">
+        <h3 className="text-center mb-4">{editId ? "Edit Post" : "Create New Post"}</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="title" className="form-label">
+              Title
             </label>
             <input
               type="text"
               className="form-control"
-             name="title"
-             onChange={handleInput}
-             value={post.title || ""}
+              name="title"
+              placeholder="Enter title"
+              onChange={handleInput}
+              value={post.title || ""}
             />
-           
           </div>
           <div className="mb-3">
-            <label htmlFor="exampleInputPassword1" className="form-label">
-             Discription
+            <label htmlFor="discription" className="form-label">
+              Description
             </label>
-            <input
-              type="text"
+            <textarea
               className="form-control"
               name="discription"
+              placeholder="Enter description"
+              rows="3"
               onChange={handleInput}
               value={post.discription || ""}
-            />
+            ></textarea>
           </div>
-        
-          <button type="submit" className="btn btn-primary">
-            Submit
+          <button type="submit" className="btn btn-primary w-100">
+            {editId ? "Update Post" : "Submit"}
           </button>
         </form>
-        <View_post handleEdit={handleEdit}/>
       </div>
-
-    
-
-    </>
+      <View_post handleEdit={handleEdit} />
+    </div>
   );
 }
 
